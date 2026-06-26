@@ -21,19 +21,23 @@ export const generateGeminiResponse = async (prompt) => {
             },
           ],
         }),
-      }
+      },
     );
 
     if (!response.ok) {
       const errorText = await response.text();
 
-      console.error("Gemini API Error:");
-      console.error("Status:", response.status);
-      console.error("Response:", errorText);
+      const errorText = await response.text();
 
-      throw new Error(
-        `Gemini API Error (${response.status}): ${errorText}`
-      );
+      console.error("================================");
+      console.error("Status:", response.status);
+      console.error("Response:");
+      console.error(errorText);
+      console.error("================================");
+
+      throw new Error(errorText);
+
+      throw new Error(`Gemini API Error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
