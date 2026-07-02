@@ -21,27 +21,27 @@ export const generateGeminiResponse = async (prompt) => {
             },
           ],
         }),
-      },
+      }
     );
 
+    // Handle API errors
     if (!response.ok) {
       const errorText = await response.text();
 
-      const errorText = await response.text();
-
       console.error("================================");
+      console.error("Gemini API Error");
       console.error("Status:", response.status);
-      console.error("Response:");
-      console.error(errorText);
+      console.error("Response:", errorText);
       console.error("================================");
 
-      throw new Error(errorText);
-
-      throw new Error(`Gemini API Error (${response.status}): ${errorText}`);
+      throw new Error(
+        `Gemini API Error (${response.status}): ${errorText}`
+      );
     }
 
     const data = await response.json();
 
+    // Validate response
     if (
       !data.candidates ||
       data.candidates.length === 0 ||
@@ -55,6 +55,7 @@ export const generateGeminiResponse = async (prompt) => {
 
     const text = data.candidates[0].content.parts[0].text;
 
+    // Remove markdown if Gemini wraps JSON in ```json ... ```
     const cleanText = text
       .replace(/```json/g, "")
       .replace(/```/g, "")
@@ -63,7 +64,8 @@ export const generateGeminiResponse = async (prompt) => {
     try {
       return JSON.parse(cleanText);
     } catch (err) {
-      console.error("JSON Parse Error:", cleanText);
+      console.error("Failed to parse Gemini JSON:");
+      console.error(cleanText);
       throw new Error("Gemini returned invalid JSON.");
     }
   } catch (error) {
